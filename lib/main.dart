@@ -261,9 +261,7 @@ class _TopNav extends StatelessWidget {
           Row(
             children: [
               CircleAvatar(
-                backgroundImage: NetworkImage(
-                  'https://picsum.photos/seed/profile/100',
-                ),
+                backgroundImage: AssetImage('assets/images/1696264573879.jpg'),
                 radius: 20,
               ),
               SizedBox(width: 10),
@@ -459,28 +457,10 @@ class _ProfileCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Hero(
-            tag: 'profile-pic',
-            child: CircleAvatar(
-              radius: 52,
-              backgroundImage: NetworkImage(
-                'https://picsum.photos/seed/profile_main/100',
-              ),
-            ),
-          ),
-          SizedBox(width: 18),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  profile['name'],
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: textColor,
-                  ),
-                ),
                 SizedBox(height: 6),
                 Text(
                   profile['title'],
