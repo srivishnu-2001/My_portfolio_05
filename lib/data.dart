@@ -158,4 +158,4 @@ class PortfolioData {
     },
   ];
 }
-//added flutter web
+//added flutter web support and updated experience section with AI integration and maps
