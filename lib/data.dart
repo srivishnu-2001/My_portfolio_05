@@ -158,3 +158,4 @@ class PortfolioData {
     },
   ];
 }
+//added flutter web
