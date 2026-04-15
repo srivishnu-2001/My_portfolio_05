@@ -3,6 +3,7 @@ import 'package:marquee/marquee.dart';
 
 import '../constants.dart';
 import '../data.dart';
+import '../utils/launcher.dart';
 import '../widgets/animated_reveal.dart';
 
 class FooterSection extends StatelessWidget {
@@ -31,7 +32,9 @@ class FooterSection extends StatelessWidget {
           ),
           child: Column(
             children: [
-              isMobile ? _buildMobileFooter(dark) : _buildDesktopFooter(dark),
+              isMobile
+                  ? _buildMobileFooter(context, dark)
+                  : _buildDesktopFooter(context, dark),
               const SizedBox(height: 40),
               const Divider(color: Colors.white12),
               const SizedBox(height: 20),
@@ -40,40 +43,40 @@ class FooterSection extends StatelessWidget {
           ),
         ),
         // Scrolling marquee strip
-        _MarqueeStrip(),
+        const _MarqueeStrip(),
       ],
     );
   }
 
-  Widget _buildDesktopFooter(bool dark) {
+  Widget _buildDesktopFooter(BuildContext context, bool dark) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(flex: 3, child: _buildBrandCol()),
+        Expanded(flex: 3, child: _buildBrandCol(context)),
         const SizedBox(width: 60),
         Expanded(flex: 2, child: _buildQuickLinks()),
         const SizedBox(width: 40),
-        Expanded(flex: 3, child: _buildContactCol()),
+        Expanded(flex: 3, child: _buildContactCol(context, dark)),
       ],
     );
   }
 
-  Widget _buildMobileFooter(bool dark) {
+  Widget _buildMobileFooter(BuildContext context, bool dark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildBrandCol(),
+        _buildBrandCol(context),
         const SizedBox(height: 36),
-        _buildContactCol(),
+        _buildContactCol(context, dark),
       ],
     );
   }
 
-  Widget _buildBrandCol() {
+  // ── Brand column with social icons ────────────────────────────────────────
+  Widget _buildBrandCol(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Logo / name
         ShaderMask(
           blendMode: BlendMode.srcIn,
           shaderCallback: (b) => AppColors.primary.createShader(
@@ -95,27 +98,31 @@ class FooterSection extends StatelessWidget {
           style: TextStyle(color: Colors.white60, fontSize: 13, height: 1.7),
         ),
         const SizedBox(height: 24),
-        // Social icons
+        // Social icons — all tappable
         Row(
           children: [
-            _SocialIcon(icon: Icons.code, tooltip: 'GitHub', onTap: () {}),
+            _SocialIcon(
+              icon: Icons.code,
+              tooltip: 'GitHub',
+              onTap: () => launchGitHub(context),
+            ),
             const SizedBox(width: 12),
             _SocialIcon(
-              icon: Icons.work_outline,
+              isLinkedIn: true,
               tooltip: 'LinkedIn',
-              onTap: () {},
+              onTap: () => launchLinkedIn(context),
             ),
             const SizedBox(width: 12),
             _SocialIcon(
               icon: Icons.email_outlined,
               tooltip: 'Email',
-              onTap: () {},
+              onTap: () => launchEmail(context),
             ),
             const SizedBox(width: 12),
             _SocialIcon(
               icon: Icons.phone_outlined,
-              tooltip: 'Phone',
-              onTap: () {},
+              tooltip: 'Call',
+              onTap: () => launchPhone(context),
             ),
           ],
         ),
@@ -147,7 +154,8 @@ class FooterSection extends StatelessWidget {
     );
   }
 
-  Widget _buildContactCol() {
+  // ── Contact column — every row tappable ──────────────────────────────────
+  Widget _buildContactCol(BuildContext context, bool dark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -160,26 +168,33 @@ class FooterSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 18),
-        _contactRow(Icons.email_outlined, PortfolioData.email),
+        _TappableFooterRow(
+          icon: Icons.email_outlined,
+          text: PortfolioData.email,
+          tooltip: 'Send Email',
+          onTap: () => launchEmail(context),
+        ),
         const SizedBox(height: 12),
-        _contactRow(Icons.phone_outlined, PortfolioData.phone),
+        _TappableFooterRow(
+          icon: Icons.phone_outlined,
+          text: PortfolioData.phone,
+          tooltip: 'Call Me',
+          onTap: () => launchPhone(context),
+        ),
         const SizedBox(height: 12),
-        _contactRow(Icons.location_on_outlined, PortfolioData.location),
-      ],
-    );
-  }
-
-  Widget _contactRow(IconData icon, String text) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon, size: 16, color: AppColors.teal),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            text,
-            style: const TextStyle(color: Colors.white60, fontSize: 13),
-          ),
+        _TappableFooterRow(
+          icon: Icons.location_on_outlined,
+          text: PortfolioData.location,
+          tooltip: '',
+          onTap: null,
+        ),
+        const SizedBox(height: 12),
+        // LinkedIn dedicated row
+        _TappableFooterRow(
+          isLinkedIn: true,
+          text: 'Connect on LinkedIn',
+          tooltip: 'Open LinkedIn',
+          onTap: () => launchLinkedIn(context),
         ),
       ],
     );
@@ -190,10 +205,9 @@ class FooterSection extends StatelessWidget {
       alignment: WrapAlignment.center,
       crossAxisAlignment: WrapCrossAlignment.center,
       spacing: 4,
-      runSpacing: 4,
       children: [
         const Text(
-          '© 2026 Srivishnu Thiriveedhi • Built with',
+          '© 2026 Srivishnu Thiriveedhi  •  Built with ',
           style: TextStyle(color: Colors.white38, fontSize: 12),
         ),
         ShaderMask(
@@ -202,12 +216,12 @@ class FooterSection extends StatelessWidget {
             Rect.fromLTWH(0, 0, b.width, b.height),
           ),
           child: const Text(
-            ' Flutter ',
+            'Flutter',
             style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
           ),
         ),
         const Text(
-          '• All rights reserved',
+          '  •  All rights reserved',
           style: TextStyle(color: Colors.white38, fontSize: 12),
         ),
       ],
@@ -215,7 +229,9 @@ class FooterSection extends StatelessWidget {
   }
 }
 
-// ─── CTA Banner ───────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// CTA Banner
+// ─────────────────────────────────────────────────────────────────────────────
 class _CtaBanner extends StatelessWidget {
   final bool dark, isMobile;
   const _CtaBanner({required this.dark, required this.isMobile});
@@ -244,107 +260,132 @@ class _CtaBanner extends StatelessWidget {
           ),
         ],
       ),
-      child: isMobile ? _buildMobileContent() : _buildDesktopContent(),
+      child: isMobile
+          ? _buildMobileContent(context)
+          : _buildDesktopContent(context),
     );
   }
 
-  Widget _buildDesktopContent() {
-    return Row(
-      children: [
-        Expanded(child: _buildText()),
-        const SizedBox(width: 40),
-        _buildButtons(),
-      ],
-    );
-  }
+  Widget _buildDesktopContent(BuildContext context) => Row(
+    children: [
+      Expanded(child: _buildText()),
+      const SizedBox(width: 40),
+      _buildButtons(context),
+    ],
+  );
 
-  Widget _buildMobileContent() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [_buildText(), const SizedBox(height: 28), _buildButtons()],
-    );
-  }
+  Widget _buildMobileContent(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      _buildText(),
+      const SizedBox(height: 28),
+      _buildButtons(context),
+    ],
+  );
 
-  Widget _buildText() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          "Let's Work Together",
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.w800,
+  Widget _buildText() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const Text(
+        "Let's Work Together",
+        style: TextStyle(
+          fontSize: 28,
+          fontWeight: FontWeight.w800,
+          color: Colors.white,
+          letterSpacing: -0.5,
+        ),
+      ),
+      const SizedBox(height: 10),
+      Text(
+        "Have a project in mind? I'd love to hear about it and bring your idea to life.",
+        style: TextStyle(
+          color: Colors.white.withOpacity(0.75),
+          fontSize: 14,
+          height: 1.6,
+        ),
+      ),
+    ],
+  );
+
+  Widget _buildButtons(BuildContext context) => Wrap(
+    spacing: 12,
+    runSpacing: 12,
+    children: [
+      // Email CTA — tappable
+      ElevatedButton.icon(
+        onPressed: () => launchEmail(context),
+        icon: const Icon(Icons.mail_outline_rounded, size: 18),
+        label: const Text('Send Email'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.white,
+          foregroundColor: AppColors.tealDark,
+          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(50),
+          ),
+          textStyle: const TextStyle(fontWeight: FontWeight.w700),
+        ),
+      ),
+      // LinkedIn CTA — tappable
+      OutlinedButton.icon(
+        onPressed: () => launchLinkedIn(context),
+        icon: Container(
+          width: 18,
+          height: 18,
+          decoration: BoxDecoration(
             color: Colors.white,
-            letterSpacing: -0.5,
+            borderRadius: BorderRadius.circular(3),
           ),
-        ),
-        const SizedBox(height: 10),
-        Text(
-          "Have a project in mind? I'd love to hear about it and bring your idea to life.",
-          style: TextStyle(
-            color: Colors.white.withOpacity(0.75),
-            fontSize: 14,
-            height: 1.6,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildButtons() {
-    return Wrap(
-      spacing: 12,
-      runSpacing: 12,
-      children: [
-        ElevatedButton.icon(
-          onPressed: () {},
-          icon: const Icon(Icons.mail_outline_rounded, size: 18),
-          label: const Text('Send Email'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.white,
-            foregroundColor: AppColors.tealDark,
-            padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(50),
+          child: const Center(
+            child: Text(
+              'in',
+              style: TextStyle(
+                color: Color(0xFF0A66C2),
+                fontSize: 10,
+                fontWeight: FontWeight.w900,
+                height: 1,
+              ),
             ),
-            textStyle: const TextStyle(fontWeight: FontWeight.w700),
           ),
         ),
-        OutlinedButton.icon(
-          onPressed: () {},
-          icon: const Icon(Icons.download_rounded, size: 18),
-          label: const Text('Download CV'),
-          style: OutlinedButton.styleFrom(
-            foregroundColor: Colors.white,
-            side: const BorderSide(color: Colors.white54, width: 1.5),
-            padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(50),
-            ),
-            textStyle: const TextStyle(fontWeight: FontWeight.w600),
+        label: const Text('LinkedIn'),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: Colors.white,
+          side: const BorderSide(color: Colors.white54, width: 1.5),
+          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(50),
           ),
+          textStyle: const TextStyle(fontWeight: FontWeight.w600),
         ),
-      ],
-    );
-  }
+      ),
+    ],
+  );
 }
 
-// ─── Social Icon ─────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// Social icon button in footer brand col
+// ─────────────────────────────────────────────────────────────────────────────
 class _SocialIcon extends StatefulWidget {
-  final IconData icon;
+  final IconData? icon;
+  final bool isLinkedIn;
   final String tooltip;
   final VoidCallback onTap;
+
   const _SocialIcon({
-    required this.icon,
+    this.icon,
+    this.isLinkedIn = false,
     required this.tooltip,
     required this.onTap,
   });
+
   @override
   State<_SocialIcon> createState() => __SocialIconState();
 }
 
 class __SocialIconState extends State<_SocialIcon> {
   bool _hovered = false;
+
   @override
   Widget build(BuildContext context) {
     return Tooltip(
@@ -358,20 +399,41 @@ class __SocialIconState extends State<_SocialIcon> {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             transform: Matrix4.translationValues(0, _hovered ? -4 : 0, 0),
-            width: 40,
-            height: 40,
+            width: 42,
+            height: 42,
             decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: _hovered ? AppColors.teal : Colors.white.withOpacity(0.08),
+              shape: widget.isLinkedIn ? BoxShape.rectangle : BoxShape.circle,
+              borderRadius: widget.isLinkedIn ? BorderRadius.circular(8) : null,
+              color: _hovered
+                  ? (widget.isLinkedIn
+                        ? const Color(0xFF0A66C2)
+                        : AppColors.teal)
+                  : Colors.white.withOpacity(0.08),
               border: Border.all(
-                color: _hovered ? AppColors.teal : Colors.white24,
+                color: _hovered
+                    ? (widget.isLinkedIn
+                          ? const Color(0xFF0A66C2)
+                          : AppColors.teal)
+                    : Colors.white24,
                 width: 1,
               ),
             ),
-            child: Icon(
-              widget.icon,
-              size: 18,
-              color: _hovered ? Colors.white : Colors.white60,
+            child: Center(
+              child: widget.isLinkedIn
+                  ? Text(
+                      'in',
+                      style: TextStyle(
+                        color: _hovered ? Colors.white : Colors.white60,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w900,
+                        height: 1,
+                      ),
+                    )
+                  : Icon(
+                      widget.icon,
+                      size: 18,
+                      color: _hovered ? Colors.white : Colors.white60,
+                    ),
             ),
           ),
         ),
@@ -380,7 +442,125 @@ class __SocialIconState extends State<_SocialIcon> {
   }
 }
 
-// ─── Footer Link ─────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// Tappable footer contact row
+// ─────────────────────────────────────────────────────────────────────────────
+class _TappableFooterRow extends StatefulWidget {
+  final IconData? icon;
+  final bool isLinkedIn;
+  final String text;
+  final String tooltip;
+  final VoidCallback? onTap;
+
+  const _TappableFooterRow({
+    this.icon,
+    this.isLinkedIn = false,
+    required this.text,
+    required this.tooltip,
+    required this.onTap,
+  });
+
+  @override
+  State<_TappableFooterRow> createState() => __TappableFooterRowState();
+}
+
+class __TappableFooterRowState extends State<_TappableFooterRow> {
+  bool _hovered = false;
+  final _liBlue = const Color(0xFF0A66C2);
+
+  @override
+  Widget build(BuildContext context) {
+    final canTap = widget.onTap != null;
+    final activeColor = widget.isLinkedIn ? _liBlue : AppColors.teal;
+
+    return Tooltip(
+      message: widget.tooltip,
+      child: MouseRegion(
+        cursor: canTap ? SystemMouseCursors.click : SystemMouseCursors.basic,
+        onEnter: (_) {
+          if (canTap) setState(() => _hovered = true);
+        },
+        onExit: (_) {
+          if (canTap) setState(() => _hovered = false);
+        },
+        child: GestureDetector(
+          onTap: widget.onTap,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
+            decoration: BoxDecoration(
+              color: _hovered
+                  ? activeColor.withOpacity(0.12)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Icon or LinkedIn logo
+                widget.isLinkedIn
+                    ? Container(
+                        width: 18,
+                        height: 18,
+                        decoration: BoxDecoration(
+                          color: _hovered ? _liBlue : _liBlue.withOpacity(0.65),
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            'in',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w900,
+                              height: 1,
+                            ),
+                          ),
+                        ),
+                      )
+                    : Icon(
+                        widget.icon,
+                        size: 16,
+                        color: _hovered
+                            ? activeColor
+                            : activeColor.withOpacity(0.65),
+                      ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    widget.text,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: _hovered ? activeColor : Colors.white60,
+                      fontWeight: _hovered
+                          ? FontWeight.w600
+                          : FontWeight.normal,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                if (canTap)
+                  AnimatedOpacity(
+                    opacity: _hovered ? 1 : 0,
+                    duration: const Duration(milliseconds: 180),
+                    child: Icon(
+                      Icons.open_in_new_rounded,
+                      size: 12,
+                      color: activeColor,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Footer nav link
+// ─────────────────────────────────────────────────────────────────────────────
 class _FooterLink extends StatefulWidget {
   final String label;
   const _FooterLink({required this.label});
@@ -400,8 +580,8 @@ class __FooterLinkState extends State<_FooterLink> {
         duration: const Duration(milliseconds: 200),
         style: TextStyle(
           fontSize: 13,
-          color: _hovered ? AppColors.teal : Colors.white54,
           fontWeight: _hovered ? FontWeight.w600 : FontWeight.normal,
+          color: _hovered ? AppColors.teal : Colors.white54,
         ),
         child: Text(widget.label),
       ),
@@ -409,7 +589,9 @@ class __FooterLinkState extends State<_FooterLink> {
   }
 }
 
-// ─── Marquee Strip ───────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// Marquee strip
+// ─────────────────────────────────────────────────────────────────────────────
 class _MarqueeStrip extends StatelessWidget {
   const _MarqueeStrip();
 

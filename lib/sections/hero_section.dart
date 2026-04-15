@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../constants.dart';
 import '../data.dart';
+import '../utils/launcher.dart';
 import '../widgets/glass_card.dart';
 
 class HeroSection extends StatefulWidget {
@@ -59,7 +60,6 @@ class _HeroSectionState extends State<HeroSection>
           ),
         );
 
-    // Slight delay before animating in
     Future.delayed(const Duration(milliseconds: 200), () {
       if (mounted) _entryCtrl.forward();
     });
@@ -88,27 +88,24 @@ class _HeroSectionState extends State<HeroSection>
     );
   }
 
-  Widget _buildDesktopLayout(bool dark) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Expanded(flex: 6, child: _buildTextBlock(dark)),
-        const SizedBox(width: 60),
-        Expanded(flex: 4, child: _buildAvatarBlock()),
-      ],
-    );
-  }
+  Widget _buildDesktopLayout(bool dark) => Row(
+    crossAxisAlignment: CrossAxisAlignment.center,
+    children: [
+      Expanded(flex: 6, child: _buildTextBlock(dark)),
+      const SizedBox(width: 60),
+      Expanded(flex: 4, child: _buildAvatarBlock()),
+    ],
+  );
 
-  Widget _buildMobileLayout(bool dark) {
-    return Column(
-      children: [
-        _buildAvatarBlock(),
-        const SizedBox(height: 40),
-        _buildTextBlock(dark),
-      ],
-    );
-  }
+  Widget _buildMobileLayout(bool dark) => Column(
+    children: [
+      _buildAvatarBlock(),
+      const SizedBox(height: 40),
+      _buildTextBlock(dark),
+    ],
+  );
 
+  // ── Text block ────────────────────────────────────────────────────────────
   Widget _buildTextBlock(bool dark) {
     return FadeTransition(
       opacity: _fade,
@@ -117,7 +114,7 @@ class _HeroSectionState extends State<HeroSection>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Label badge
+            // "Available for Work" badge
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
               decoration: BoxDecoration(
@@ -145,7 +142,7 @@ class _HeroSectionState extends State<HeroSection>
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Text(
+                  const Text(
                     'Available for Work',
                     style: TextStyle(
                       fontSize: 12,
@@ -173,10 +170,10 @@ class _HeroSectionState extends State<HeroSection>
             ),
             const SizedBox(height: 22),
 
-            // Typing animation tagline
+            // Typing tagline
             Row(
               children: [
-                Text(
+                const Text(
                   '› ',
                   style: TextStyle(
                     color: AppColors.teal,
@@ -212,11 +209,41 @@ class _HeroSectionState extends State<HeroSection>
 
             // Bio
             Text(PortfolioData.summary, style: AppTextStyles.heroBio(dark)),
-            const SizedBox(height: 36),
+            const SizedBox(height: 32),
 
-            // Contact info row
-            _buildContactRow(dark),
-            const SizedBox(height: 36),
+            // ── Tappable contact chips ────────────────────────────────────
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: [
+                _ContactChip(
+                  icon: Icons.email_outlined,
+                  label: PortfolioData.email,
+                  tooltip: 'Send Email',
+                  onTap: () => launchEmail(context),
+                  dark: dark,
+                ),
+                _ContactChip(
+                  icon: Icons.phone_outlined,
+                  label: PortfolioData.phone,
+                  tooltip: 'Call Me',
+                  onTap: () => launchPhone(context),
+                  dark: dark,
+                ),
+                _ContactChip(
+                  icon: Icons.location_on_outlined,
+                  label: PortfolioData.location,
+                  tooltip: 'Location',
+                  onTap: null, // location is not tappable
+                  dark: dark,
+                ),
+              ],
+            ),
+            const SizedBox(height: 28),
+
+            // ── LinkedIn badge ────────────────────────────────────────────
+            _LinkedInBadge(onTap: () => launchLinkedIn(context)),
+            const SizedBox(height: 32),
 
             // CTA buttons
             Wrap(
@@ -232,7 +259,7 @@ class _HeroSectionState extends State<HeroSection>
                   label: 'Contact Me',
                   icon: Icons.mail_outline_rounded,
                   outlined: true,
-                  onTap: () {},
+                  onTap: () => launchEmail(context),
                 ),
               ],
             ),
@@ -242,37 +269,7 @@ class _HeroSectionState extends State<HeroSection>
     );
   }
 
-  Widget _buildContactRow(bool dark) {
-    return Wrap(
-      spacing: 20,
-      runSpacing: 8,
-      children: [
-        _contactChip(Icons.email_outlined, PortfolioData.email, dark),
-        _contactChip(Icons.phone_outlined, PortfolioData.phone, dark),
-        _contactChip(Icons.location_on_outlined, PortfolioData.location, dark),
-      ],
-    );
-  }
-
-  Widget _contactChip(IconData icon, String text, bool dark) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 15, color: AppColors.teal),
-        const SizedBox(width: 6),
-        Text(
-          text,
-          style: TextStyle(
-            fontSize: 13,
-            color: dark
-                ? AppColors.textMutedOnDark
-                : AppColors.textMutedOnLight,
-          ),
-        ),
-      ],
-    );
-  }
-
+  // ── Avatar block ──────────────────────────────────────────────────────────
   Widget _buildAvatarBlock() {
     return FadeTransition(
       opacity: _avatarFade,
@@ -287,7 +284,7 @@ class _HeroSectionState extends State<HeroSection>
           child: Stack(
             alignment: Alignment.center,
             children: [
-              // Glow ring
+              // Outer glow
               Container(
                 width: 260,
                 height: 260,
@@ -301,9 +298,9 @@ class _HeroSectionState extends State<HeroSection>
                   ),
                 ),
               ),
-              // Rotating border
+              // Rotating dashed ring
               _RotatingBorder(size: 220),
-              // Profile picture
+              // Profile photo
               Container(
                 width: 190,
                 height: 190,
@@ -338,7 +335,209 @@ class _HeroSectionState extends State<HeroSection>
   }
 }
 
-// Slowly rotating dashed ring around the avatar
+// ─────────────────────────────────────────────────────────────────────────────
+// Tappable contact chip
+// ─────────────────────────────────────────────────────────────────────────────
+class _ContactChip extends StatefulWidget {
+  final IconData icon;
+  final String label;
+  final String tooltip;
+  final VoidCallback? onTap;
+  final bool dark;
+
+  const _ContactChip({
+    required this.icon,
+    required this.label,
+    required this.tooltip,
+    required this.onTap,
+    required this.dark,
+  });
+
+  @override
+  State<_ContactChip> createState() => __ContactChipState();
+}
+
+class __ContactChipState extends State<_ContactChip> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final canTap = widget.onTap != null;
+    return Tooltip(
+      message: widget.tooltip,
+      child: MouseRegion(
+        cursor: canTap ? SystemMouseCursors.click : SystemMouseCursors.basic,
+        onEnter: (_) {
+          if (canTap) setState(() => _hovered = true);
+        },
+        onExit: (_) {
+          if (canTap) setState(() => _hovered = false);
+        },
+        child: GestureDetector(
+          onTap: widget.onTap,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            decoration: BoxDecoration(
+              color: _hovered
+                  ? AppColors.teal.withOpacity(0.12)
+                  : (widget.dark
+                        ? Colors.white.withOpacity(0.05)
+                        : Colors.black.withOpacity(0.04)),
+              borderRadius: BorderRadius.circular(50),
+              border: Border.all(
+                color: _hovered
+                    ? AppColors.teal.withOpacity(0.5)
+                    : (widget.dark
+                          ? Colors.white24
+                          : Colors.black.withOpacity(0.12)),
+                width: 1,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  widget.icon,
+                  size: 14,
+                  color: _hovered ? AppColors.teal : AppColors.teal,
+                ),
+                const SizedBox(width: 7),
+                Text(
+                  widget.label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: _hovered
+                        ? AppColors.teal
+                        : (widget.dark
+                              ? AppColors.textMutedOnDark
+                              : AppColors.textMutedOnLight),
+                    fontWeight: _hovered ? FontWeight.w600 : FontWeight.normal,
+                  ),
+                ),
+                if (canTap) ...[
+                  const SizedBox(width: 4),
+                  Icon(
+                    Icons.open_in_new_rounded,
+                    size: 10,
+                    color: _hovered
+                        ? AppColors.teal
+                        : (widget.dark
+                              ? AppColors.textMutedOnDark
+                              : AppColors.textMutedOnLight),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LinkedIn badge
+// ─────────────────────────────────────────────────────────────────────────────
+class _LinkedInBadge extends StatefulWidget {
+  final VoidCallback onTap;
+  const _LinkedInBadge({required this.onTap});
+
+  @override
+  State<_LinkedInBadge> createState() => __LinkedInBadgeState();
+}
+
+class __LinkedInBadgeState extends State<_LinkedInBadge> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 220),
+          transform: Matrix4.translationValues(0, _hovered ? -2 : 0, 0),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(
+            color: _hovered
+                ? const Color(0xFF0A66C2).withOpacity(0.15)
+                : const Color(0xFF0A66C2).withOpacity(0.08),
+            borderRadius: BorderRadius.circular(50),
+            border: Border.all(
+              color: _hovered
+                  ? const Color(0xFF0A66C2).withOpacity(0.8)
+                  : const Color(0xFF0A66C2).withOpacity(0.35),
+              width: 1.3,
+            ),
+            boxShadow: _hovered
+                ? [
+                    BoxShadow(
+                      color: const Color(0xFF0A66C2).withOpacity(0.25),
+                      blurRadius: 16,
+                      offset: const Offset(0, 4),
+                    ),
+                  ]
+                : [],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // LinkedIn "in" logo rendered with text
+              Container(
+                width: 22,
+                height: 22,
+                decoration: BoxDecoration(
+                  color: _hovered
+                      ? const Color(0xFF0A66C2)
+                      : const Color(0xFF0A66C2).withOpacity(0.80),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Center(
+                  child: Text(
+                    'in',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w900,
+                      height: 1,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                'Connect on LinkedIn',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: _hovered
+                      ? const Color(0xFF0A66C2)
+                      : const Color(0xFF0A66C2).withOpacity(0.80),
+                ),
+              ),
+              const SizedBox(width: 6),
+              Icon(
+                Icons.open_in_new_rounded,
+                size: 12,
+                color: _hovered
+                    ? const Color(0xFF0A66C2)
+                    : const Color(0xFF0A66C2).withOpacity(0.60),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Rotating dashed border ring around avatar
+// ─────────────────────────────────────────────────────────────────────────────
 class _RotatingBorder extends StatefulWidget {
   final double size;
   const _RotatingBorder({required this.size});
@@ -349,6 +548,7 @@ class _RotatingBorder extends StatefulWidget {
 class __RotatingBorderState extends State<_RotatingBorder>
     with SingleTickerProviderStateMixin {
   late final AnimationController _ctrl;
+
   @override
   void initState() {
     super.initState();
@@ -399,10 +599,9 @@ class _DashedCirclePainter extends CustomPainter {
     const dashCount = 20;
     const dashAngle = 2 * 3.14159 / dashCount;
     for (int i = 0; i < dashCount; i += 2) {
-      final start = dashAngle * i;
       canvas.drawArc(
         Rect.fromCircle(center: center, radius: radius),
-        start,
+        dashAngle * i,
         dashAngle * 0.6,
         false,
         paint,

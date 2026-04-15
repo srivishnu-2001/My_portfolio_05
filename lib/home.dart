@@ -8,6 +8,7 @@ import 'sections/skills_section.dart';
 import 'sections/experience_section.dart';
 import 'sections/projects_section.dart';
 import 'sections/footer_section.dart';
+import 'utils/launcher.dart';
 
 class PortfolioHome extends StatefulWidget {
   final VoidCallback onToggleTheme;
@@ -255,24 +256,24 @@ class _TopNav extends StatelessWidget {
             const SizedBox(width: 8),
             // Hire Me button
             Container(
-              decoration: BoxDecoration(
-                gradient: AppColors.primary,
-                borderRadius: BorderRadius.circular(50),
-              ),
-              child: TextButton(
-                onPressed: () {},
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 20, vertical: 10),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50)),
-                ),
-                child: const Text('Hire Me',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 13)),
-              ),
+            decoration: BoxDecoration(
+            gradient: AppColors.primary,
+            borderRadius: BorderRadius.circular(50),
+            ),
+            child: TextButton(
+            onPressed: () => launchEmail(context),
+            style: TextButton.styleFrom(
+            padding: const EdgeInsets.symmetric(
+            horizontal: 20, vertical: 10),
+            shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(50)),
+            ),
+            child: const Text('Hire Me',
+            style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
+            fontSize: 13)),
+            ),
             ),
             const SizedBox(width: 12),
           ],

@@ -9,7 +9,9 @@ class PortfolioData {
   static const String location = 'Nellore, Andhra Pradesh';
   static const String github = 'https://github.com/srivishnu-thiriveedhi';
   static const String linkedin =
-      'https://linkedin.com/in/srivishnu-thiriveedhi';
+      'https://www.linkedin.com/in/sri-vishnu-2a1777276?utm_source=share_via&utm_content=profile&utm_medium=member_android';
+  static const String phoneUri = 'tel:+918106824579';
+  static const String emailUri = 'mailto:srivishnuthiriveedhi@gmail.com';
 
   static const String summary =
       'MCA graduate with 17+ months of hands-on Flutter development experience. '
