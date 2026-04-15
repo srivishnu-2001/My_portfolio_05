@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:visibility_detector/visibility_detector.dart';
+
 import 'constants.dart';
 import 'home.dart';
+//implemented on tap functionalities about contacts on 15-04-2026
 
 void main() {
   VisibilityDetectorController.instance.updateInterval = Duration.zero;
@@ -20,8 +22,9 @@ class _PortfolioAppState extends State<PortfolioApp> {
 
   void _toggleTheme() {
     setState(() {
-      _themeMode =
-          _themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
+      _themeMode = _themeMode == ThemeMode.dark
+          ? ThemeMode.light
+          : ThemeMode.dark;
     });
   }
 
@@ -31,10 +34,9 @@ class _PortfolioAppState extends State<PortfolioApp> {
       debugShowCheckedModeBanner: false,
       title: 'Srivishnu Thiriveedhi – Flutter Developer',
       themeMode: _themeMode,
-      theme:     _lightTheme(),
+      theme: _lightTheme(),
       darkTheme: _darkTheme(),
-      home: PortfolioHome(
-          onToggleTheme: _toggleTheme, themeMode: _themeMode),
+      home: PortfolioHome(onToggleTheme: _toggleTheme, themeMode: _themeMode),
     );
   }
 
